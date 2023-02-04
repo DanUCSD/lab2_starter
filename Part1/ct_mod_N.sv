@@ -1,6 +1,7 @@
 // CSE140L  
 // What does this do? 
 // When does "z" go high? 
+    // when counter is 59, need to deal with carry out
 module ct_mod_N #(parameter N=60)(
   input clk, rst, en,
   output logic[6:0] ct_out,

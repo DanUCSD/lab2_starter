@@ -31,26 +31,30 @@ module top_level_lab2_part1(
 
    // be sure to set parameters on ct_mod_N modules
    // seconds counter runs continuously, but stalls when Timeset is on 
+          // en(1) since this is always enabled.
    ct_mod_N #(.N()) Sct(
-        .clk(Pulse), .rst(Reset), .en(), .ct_out(TSec), .z(Smax)
+         .clk(Pulse), .rst(Reset), .en(1), .ct_out(TSec), .z(Smax)    
    );
 
    // minutes counter -- runs at either 1/sec or 1/60sec
    // make the appropriate connections. Make sure you use
    // a consistent clock signal. Do not use logic signals as clocks 
    // (EVER IN THIS CLASS)
+        // if Smax is true (if we need to increment minutes), then run this
+   TMen = Smax;
    ct_mod_N #(.N()) Mct(
-    .clk(), .rst(), .en(TMen), .ct_out(TMin), .z(Mmax)
+         .clk(Pulse), .rst(Reset), .en(TMen), .ct_out(TMin), .z(Mmax)
    );
 
    // hours counter -- runs at either 1/sec or 1/60min
+   THen = Mmax;
    ct_mod_N #(.N()) Hct(                          
-        .clk(), .rst(), .en(), .ct_out(), .z()
+         .clk(Pulse), .rst(Reset), .en(THen), .ct_out(THrs), .z(Hmax)
    );
 
    // AM/PM state  --  runs at 1/12 sec or 1/12hrs
-   regce TPMct(.out(), .inp(), .en(),
-               .clk(), .rst());
+   regce TPMct(.out(), .inp(), .en(Smax && Mmax && Hmax),
+               .clk(Pulse), .rst(Reset));
 
 
 
