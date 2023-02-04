@@ -16,4 +16,7 @@ module alarm(
     not <=
     buzz = ( condition for matching min's hours and pm/am )
     */
+	 
+	 assign buzz = (tmin == amin) && (thrs == ahrs) && (tpm == apm);
+	 
 endmodule

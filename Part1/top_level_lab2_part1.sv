@@ -41,30 +41,31 @@ module top_level_lab2_part1(
    // a consistent clock signal. Do not use logic signals as clocks 
    // (EVER IN THIS CLASS)
         // if Smax is true (if we need to increment minutes), then run this
-   TMen = Smax;
+   assign TMen = Smax;
    ct_mod_N #(.N()) Mct(
          .clk(Pulse), .rst(Reset), .en(TMen), .ct_out(TMin), .z(Mmax)
    );
 
    // hours counter -- runs at either 1/sec or 1/60min
-   THen = Mmax;
+   assign THen = Mmax;
    ct_mod_N #(.N()) Hct(                          
          .clk(Pulse), .rst(Reset), .en(THen), .ct_out(THrs), .z(Hmax)
    );
 
    // AM/PM state  --  runs at 1/12 sec or 1/12hrs
-   regce TPMct(.out(), .inp(), .en(Smax && Mmax && Hmax),
+	assign TPmen = THrs == 12;
+   regce TPMct(.out(TPm), .inp(TPmen), .en(Smax && Mmax && Hmax),
                .clk(Pulse), .rst(Reset));
 
 
 
 // alarm set registers -- either hold or advance 1/sec
   ct_mod_N #(.N()) Mreg(
-    .clk(), .rst(), .en(AMen), .ct_out(AMin), .z()
+    .clk(Pulse), .rst(Reset), .en(AMen), .ct_out(AMin), .z()
    ); 
 
   ct_mod_N #(.N()) Hreg(          
-    .clk(), .rst(), .en(), .ct_out(), .z()
+    .clk(Pulse), .rst(Reset), .en(AHen), .ct_out(), .z()
   ); 
 
    // alarm AM/PM state 
@@ -99,7 +100,7 @@ module top_level_lab2_part1(
    // display select logic (decide what to send to the seven segment outputs) 
     
    alarm a1(
-           .tmin(), .amin(), .thrs(), .ahrs(), .tpm(), .apm(), .buzz()
+           .tmin(TMin), .amin(AMin), .thrs(THrs), .ahrs(AHrs), .tpm(Tpm), .apm(APm), .buzz(Buzz1)
            );
 
   
