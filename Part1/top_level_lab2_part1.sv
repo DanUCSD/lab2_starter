@@ -47,13 +47,13 @@ module top_level_lab2_part1(
    );
 
    // hours counter -- runs at either 1/sec or 1/60min
-   assign THen = Mmax;
-   ct_mod_N #(.N()) Hct(                          
+   assign THen = Mmax && Smax;  // It resets to 00 instead of staying at 12.
+   ct_mod_N #(.N(12)) Hct(                          
          .clk(Pulse), .rst(Reset), .en(THen), .ct_out(THrs), .z(Hmax)
    );
 
    // AM/PM state  --  runs at 1/12 sec or 1/12hrs
-	assign TPmen = THrs == 12;
+	assign TPmen = THrs == 12;  // I don't get this.
    regce TPMct(.out(TPm), .inp(TPmen), .en(Smax && Mmax && Hmax),
                .clk(Pulse), .rst(Reset));
 
@@ -81,15 +81,15 @@ module top_level_lab2_part1(
    );
 
    lcd_int Mdisp(
-    .bin_in    () ,
-        .Segment1  (),
-        .Segment0  ()
+    .bin_in    (TMin) ,
+        .Segment1  (M1disp),
+        .Segment0  (M0disp)
         );
 
   lcd_int Hdisp(
-    .bin_in    (),
-        .Segment1  (),
-        .Segment0  ()
+    .bin_in    (THrs),
+        .Segment1  (H1disp),
+        .Segment0  (H0disp)
         );
 
    // counter enable control logic
