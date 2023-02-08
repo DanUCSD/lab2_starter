@@ -2,3 +2,9 @@
 simulation/
 .bat
 output_files/
+Part1/db/
+Part1/incremental_db/
+*.bak
+*.qpf
+*.qsf
+*.qws
