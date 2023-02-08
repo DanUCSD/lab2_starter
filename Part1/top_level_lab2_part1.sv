@@ -53,24 +53,27 @@ module top_level_lab2_part1(
    );
 
    // AM/PM state  --  runs at 1/12 sec or 1/12hrs
-	assign TPmen = THrs == 12;  // I don't get this.
-   regce TPMct(.out(TPm), .inp(TPmen), .en(Smax && Mmax && Hmax),
+   assign TPmen = Smax && Mmax && Hmax;
+   regce TPMct(.out(TPm), .inp(!Tpm), .en(TPmen),
                .clk(Pulse), .rst(Reset));
 
 
 
 // alarm set registers -- either hold or advance 1/sec
+  AMen = Timeset;
   ct_mod_N #(.N()) Mreg(
-    .clk(Pulse), .rst(Reset), .en(AMen), .ct_out(AMin), .z()
+    .clk(Pulse), .rst(Reset), .en(AMen), .ct_out(AMin), .z(AMmax)
    ); 
 
-  ct_mod_N #(.N()) Hreg(          
-    .clk(Pulse), .rst(Reset), .en(AHen), .ct_out(), .z()
+  AHen = AMmax && Timeset;
+  ct_mod_N #(.N(12)) Hreg(          
+    .clk(Pulse), .rst(Reset), .en(AHen), .ct_out(AHrs), .z(AHmax)
   ); 
 
    // alarm AM/PM state 
-   regce APMReg(.out(APm), .inp(), .en(),
-               .clk(), .rst());
+   APmen = AMmax && AHmax;
+   regce APMReg(.out(APm), .inp(!Apm), .en(APmen),
+               .clk(Pulse), .rst(Reset));
 
 
    // display drivers (2 digits each, 6 digits total)
