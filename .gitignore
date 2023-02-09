@@ -8,3 +8,5 @@ Part1/incremental_db/
 *.qpf
 *.qsf
 *.qws
+*.rpt
+Part1/sim/*

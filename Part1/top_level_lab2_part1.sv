@@ -31,9 +31,8 @@ module top_level_lab2_part1(
 
    // be sure to set parameters on ct_mod_N modules
    // seconds counter runs continuously, but stalls when Timeset is on 
-          // en(1) since this is always enabled.
    ct_mod_N #(.N()) Sct(
-         .clk(Pulse), .rst(Reset), .en(1), .ct_out(TSec), .z(Smax)    
+         .clk(Pulse), .rst(Reset), .en(!Timeset), .ct_out(TSec), .z(Smax)    
    );
 
    // minutes counter -- runs at either 1/sec or 1/60sec
@@ -41,45 +40,37 @@ module top_level_lab2_part1(
    // a consistent clock signal. Do not use logic signals as clocks 
    // (EVER IN THIS CLASS)
         // if Smax is true (if we need to increment minutes), then run this
-   assign TMen = Smax;
+   assign TMen = Smax || (Timeset && Minadv);
    ct_mod_N #(.N()) Mct(
          .clk(Pulse), .rst(Reset), .en(TMen), .ct_out(TMin), .z(Mmax)
    );
 
    // hours counter -- runs at either 1/sec or 1/60min
-   assign THen = Mmax && Smax;  // It resets to 00 instead of staying at 12.
+   assign THen = (Mmax && Smax) || (Timeset && Hrsadv);  // It resets to 00 instead of staying at 12.
    ct_mod_N #(.N(12)) Hct(                          
          .clk(Pulse), .rst(Reset), .en(THen), .ct_out(THrs), .z(Hmax)
    );
 
    // AM/PM state  --  runs at 1/12 sec or 1/12hrs
-<<<<<<< HEAD
-	assign TPmen = THrs == 12;  // I don't get this.
-   regce TPMct(.out(TPm), .inp(TPmen), .en(Smax && Mmax && Hmax),
-=======
-   assign TPmen = Smax && Mmax && Hmax;
+   assign TPmen = (Smax && Mmax && Hmax) || (Timeset && Hmax && Hrsadv) || (Timeset && Hmax && Mmax && Minadv);
    regce TPMct(.out(TPm), .inp(!Tpm), .en(TPmen),
->>>>>>> d1b93aaeebbc73ee008e6a28a57cabd88be58774
                .clk(Pulse), .rst(Reset));
 
-
-
-// alarm set registers -- either hold or advance 1/sec
-  AMen = Timeset;
+	// alarm set registers -- either hold or advance 1/sec
+  assign AMen = Timeset;
   ct_mod_N #(.N()) Mreg(
     .clk(Pulse), .rst(Reset), .en(AMen), .ct_out(AMin), .z(AMmax)
    ); 
 
-  AHen = AMmax && Timeset;
+  assign AHen = AMmax && Timeset;
   ct_mod_N #(.N(12)) Hreg(          
     .clk(Pulse), .rst(Reset), .en(AHen), .ct_out(AHrs), .z(AHmax)
   ); 
 
    // alarm AM/PM state 
-   APmen = AMmax && AHmax;
+   assign APmen = AMmax && AHmax;
    regce APMReg(.out(APm), .inp(!Apm), .en(APmen),
                .clk(Pulse), .rst(Reset));
-
 
    // display drivers (2 digits each, 6 digits total)
    lcd_int Sdisp(
@@ -95,7 +86,7 @@ module top_level_lab2_part1(
         );
 
   lcd_int Hdisp(
-    .bin_in    (THrs),
+    .bin_in    (THrs == 0 ? 12: THrs),
         .Segment1  (H1disp),
         .Segment0  (H0disp)
         );
