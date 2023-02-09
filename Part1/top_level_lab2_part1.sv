@@ -46,7 +46,7 @@ module top_level_lab2_part1(
    );
 
    // hours counter -- runs at either 1/sec or 1/60min
-   assign THen = (Mmax && Smax) || (Timeset && Hrsadv);  // It resets to 00 instead of staying at 12.
+   assign THen = (Mmax && Smax) || (Timeset && Hrsadv) || (Timeset && Mmax && Minadv);  // It resets to 00 instead of staying at 12.
    ct_mod_N #(.N(12)) Hct(                          
          .clk(Pulse), .rst(Reset), .en(THen), .ct_out(THrs), .z(Hmax)
    );
