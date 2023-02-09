@@ -57,18 +57,18 @@ module top_level_lab2_part1(
                .clk(Pulse), .rst(Reset));
 
 	// alarm set registers -- either hold or advance 1/sec
-  assign AMen = Timeset;
+  assign AMen = Timeset && Minadv;
   ct_mod_N #(.N()) Mreg(
     .clk(Pulse), .rst(Reset), .en(AMen), .ct_out(AMin), .z(AMmax)
    ); 
 
-  assign AHen = AMmax && Timeset;
+  assign AHen = Timeset && ((Minadv && AMmax) || Hrsadv);
   ct_mod_N #(.N(12)) Hreg(          
     .clk(Pulse), .rst(Reset), .en(AHen), .ct_out(AHrs), .z(AHmax)
   ); 
 
    // alarm AM/PM state 
-   assign APmen = AMmax && AHmax;
+   assign APmen = Timeset && ((AHmax && Minadv && AMmax) || (AHmax && Hrsadv));
    regce APMReg(.out(APm), .inp(!Apm), .en(APmen),
                .clk(Pulse), .rst(Reset));
 
