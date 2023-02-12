@@ -106,6 +106,6 @@ module top_level_lab2_part1(
   
    // generate AMorPM signal (what are the sources for this LED?)/
 	
-	assign AMorPM = TPm;
+	assign AMorPM = Alarmset ? APm : TPm;
 
 endmodule
