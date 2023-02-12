@@ -27,7 +27,7 @@ module top_level_lab2_part1(
   logic[6:0] Min, Hrs;                     // drive Min and Hr displays
   logic Smax, Mmax, Hmax,          // "carry out" from sec -> min, min -> hrs, hrs -> days
         TMen, THen, TPmen, AMen, AHen, AHmax, AMmax, APmen;    // respective counter enables
-  logic         Buzz1;             // intermediate Buzz signal
+//  logic         Buzz1;             // intermediate Buzz signal
 
    // be sure to set parameters on ct_mod_N modules
    // seconds counter runs continuously, but stalls when Timeset is on 
@@ -53,23 +53,23 @@ module top_level_lab2_part1(
 
    // AM/PM state  --  runs at 1/12 sec or 1/12hrs
    assign TPmen = (Smax && Mmax && Hmax) || (Timeset && Hmax && Hrsadv) || (Timeset && Hmax && Mmax && Minadv);
-   regce TPMct(.out(TPm), .inp(!Tpm), .en(TPmen),
+   regce TPMct(.out(TPm), .inp(!TPm), .en(TPmen),
                .clk(Pulse), .rst(Reset));
 
 	// alarm set registers -- either hold or advance 1/sec
-  assign AMen = Timeset && Minadv;
+  assign AMen = Alarmset && Minadv;
   ct_mod_N #(.N()) Mreg(
     .clk(Pulse), .rst(Reset), .en(AMen), .ct_out(AMin), .z(AMmax)
    ); 
 
-  assign AHen = Timeset && ((Minadv && AMmax) || Hrsadv);
+  assign AHen = Alarmset && ((Minadv && AMmax) || Hrsadv);
   ct_mod_N #(.N(12)) Hreg(          
     .clk(Pulse), .rst(Reset), .en(AHen), .ct_out(AHrs), .z(AHmax)
   ); 
 
    // alarm AM/PM state 
-   assign APmen = Timeset && ((AHmax && Minadv && AMmax) || (AHmax && Hrsadv));
-   regce APMReg(.out(APm), .inp(!Apm), .en(APmen),
+   assign APmen = Alarmset && ((AHmax && Minadv && AMmax) || (AHmax && Hrsadv));
+   regce APMReg(.out(APm), .inp(!APm), .en(APmen),
                .clk(Pulse), .rst(Reset));
 
    // display drivers (2 digits each, 6 digits total)
@@ -80,13 +80,13 @@ module top_level_lab2_part1(
    );
 
    lcd_int Mdisp(
-    .bin_in    (TMin) ,
+    .bin_in    (Alarmset ? AMin: TMin) ,
         .Segment1  (M1disp),
         .Segment0  (M0disp)
         );
 
   lcd_int Hdisp(
-    .bin_in    (THrs == 0 ? 12: THrs),
+    .bin_in    (Alarmset ? AHrs == 0 ? 12 : AHrs: THrs == 0 ? 12: THrs),
         .Segment1  (H1disp),
         .Segment0  (H0disp)
         );
@@ -97,13 +97,15 @@ module top_level_lab2_part1(
   
    
    // display select logic (decide what to send to the seven segment outputs) 
-    
+   
    alarm a1(
-           .tmin(TMin), .amin(AMin), .thrs(THrs), .ahrs(AHrs), .tpm(Tpm), .apm(APm), .buzz(Buzz1)
+           .tmin(TMin), .amin(AMin), .thrs(THrs), .ahrs(AHrs), .tpm(TPm), .apm(APm), .buzz(Buzz1)
            );
 
+	assign Buzz = Alarmon ? Buzz1 : 0;
   
    // generate AMorPM signal (what are the sources for this LED?)/
- 
+	
+	assign AMorPM = TPm;
 
 endmodule
