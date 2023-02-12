@@ -27,7 +27,7 @@ module top_level_lab2_part1(
   logic[6:0] Min, Hrs;                     // drive Min and Hr displays
   logic Smax, Mmax, Hmax,          // "carry out" from sec -> min, min -> hrs, hrs -> days
         TMen, THen, TPmen, AMen, AHen, AHmax, AMmax, APmen;    // respective counter enables
-//  logic         Buzz1;             // intermediate Buzz signal
+        logic         Buzz1;             // intermediate Buzz signal
 
    // be sure to set parameters on ct_mod_N modules
    // seconds counter runs continuously, but stalls when Timeset is on 
