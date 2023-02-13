@@ -97,7 +97,7 @@ module top_level_lab2_part2(
 
   // Day LED, Dayen'ed when dayadv or (pm and (natural roll over or hrsadv roll over or minadv roll over))
 
-  assign Dayen = Dayadv || (TPm && (Smax && Mmax && Hmax) || (Timeset && Hmax && Hrsadv) || (Timeset && Hmax && Mmax && Minadv));
+  assign Dayen = Dayadv || (TPm && ((Smax && Mmax && Hmax) || (Timeset && Hmax && Hrsadv) || (Timeset && Hmax && Mmax && Minadv)));
   ct_mod_N #(.N(7)) Dct(                          
          .clk(Pulse), .rst(Reset), .en(Dayen), .ct_out(TDay), .z(Dmax)
    );
