@@ -5,8 +5,8 @@ module top_level_lab2_part3(
   input Reset,
         Timeset,    // manual buttons
         Alarmset,   //  (five total)
-    Minadv,
-    Hrsadv,
+		  Minadv,
+		  Hrsadv,
         Dayadv,
         Monthadv,
         Dateadv,

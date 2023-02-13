@@ -26,7 +26,7 @@ module top_level_lab2_part2(
    
      
   logic[6:0] Min, Hrs;                     // drive Min and Hr displays
-  logic Smax, Mmax, Hmax, Dmax         // "carry out" from sec -> min, min -> hrs, hrs -> days
+  logic Smax, Mmax, Hmax, Dmax,         // "carry out" from sec -> min, min -> hrs, hrs -> days
         TMen, THen, TPmen, AMen, AHen, AHmax, AMmax, APmen,    // respective counter enables
         Dayen;
         logic         Buzz1;             // intermediate Buzz signal
@@ -98,19 +98,21 @@ module top_level_lab2_part2(
   // Day LED, Dayen'ed when dayadv or (pm and (natural roll over or hrsadv roll over or minadv roll over))
 
   assign Dayen = Dayadv || (TPm && (Smax && Mmax && Hmax) || (Timeset && Hmax && Hrsadv) || (Timeset && Hmax && Mmax && Minadv));
-  ct_mod_N #(.N(7)) Hct(                          
+  ct_mod_N #(.N(7)) Dct(                          
          .clk(Pulse), .rst(Reset), .en(Dayen), .ct_out(TDay), .z(Dmax)
    );
 
-  always_comb case(TDay) 
-    3'b000 : DayLED = 7'b0111111;
-    3'b001 : DayLED = 7'b1011111;
-    3'b010 : DayLED = 7'b1101111;
-    3'b011 : DayLED = 7'b1110111;
-    3'b100 : DayLED = 7'b1111011;
-    3'b101 : DayLED = 7'b1111101;
-    3'b110 : DayLED = 7'b1111110;
-    default : DayLED = 7'h00;
-  endcase
+//  always_comb case(TDay) 
+//    3'b000 : DayLED = 7'b0111111;
+//    3'b001 : DayLED = 7'b1011111;
+//    3'b010 : DayLED = 7'b1101111;
+//    3'b011 : DayLED = 7'b1110111;
+//    3'b100 : DayLED = 7'b1111011;
+//    3'b101 : DayLED = 7'b1111101;
+//    3'b110 : DayLED = 7'b1111110;
+//    default : DayLED = 7'h00;
+//  endcase
 
+	assign DayLED = TDay == 0 ? 7'b1000000 : TDay == 1 ? 7'b0100000 : TDay == 2 ? 7'b0010000 : TDay == 3 ? 7'b0001000 :
+						 TDay == 4 ? 7'b0000100 : TDay == 5 ? 7'b0000010 : TDay == 6 ? 7'b0000001 : 7'h00;
 endmodule
