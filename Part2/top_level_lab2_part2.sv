@@ -22,7 +22,7 @@ module top_level_lab2_part2(
    logic       TPm;                // time PM
    logic [6:0] AMin, AHrs;         // alarm setting
    logic       APm;                // alarm PM
-   logic       TDay;
+   logic [2:0] TDay;
    
      
   logic[6:0] Min, Hrs;                     // drive Min and Hr displays
@@ -95,22 +95,21 @@ module top_level_lab2_part2(
  
 	assign AMorPM = Alarmset ? APm : TPm;
 
-  // Day LED
+  // Day LED, Dayen'ed when dayadv or (pm and (natural roll over or hrsadv roll over or minadv roll over))
 
-  assign Dayen = TPm && (Smax && Mmax && Hmax) || (Timeset && Hmax && Hrsadv) || (Timeset && Hmax && Mmax && Minadv);
+  assign Dayen = Dayadv || (TPm && (Smax && Mmax && Hmax) || (Timeset && Hmax && Hrsadv) || (Timeset && Hmax && Mmax && Minadv));
   ct_mod_N #(.N(7)) Hct(                          
          .clk(Pulse), .rst(Reset), .en(Dayen), .ct_out(TDay), .z(Dmax)
    );
 
   always_comb case(TDay) 
-    4'b0000 : Segment0 = 7'b1000000;
-    0 : DayLED = 7'b0111111;
-    1 : DayLED = 7'b1011111;
-    2 : DayLED = 7'b1101111;
-    3 : DayLED = 7'b1110111;
-    4 : DayLED = 7'b1111011;
-    5 : DayLED = 7'b1111101;
-    6 : DayLED = 7'b1111110;
+    3'b000 : DayLED = 7'b0111111;
+    3'b001 : DayLED = 7'b1011111;
+    3'b010 : DayLED = 7'b1101111;
+    3'b011 : DayLED = 7'b1110111;
+    3'b100 : DayLED = 7'b1111011;
+    3'b101 : DayLED = 7'b1111101;
+    3'b110 : DayLED = 7'b1111110;
     default : DayLED = 7'h00;
   endcase
 
