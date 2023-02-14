@@ -48,13 +48,13 @@ module top_level_lab2_part2(
    );
 
    // hours counter -- runs at either 1/sec or 1/60min
-   assign THen = (Mmax && Smax) || (Timeset && Hrsadv) || (Timeset && Mmax && Minadv);  // It resets to 00 instead of staying at 12.
+   assign THen = (Mmax && Smax) || (Timeset && Hrsadv);  // It resets to 00 instead of staying at 12.
    ct_mod_N #(.N(12)) Hct(                          
          .clk(Pulse), .rst(Reset), .en(THen), .ct_out(THrs), .z(Hmax)
    );
 
    // AM/PM state  --  runs at 1/12 sec or 1/12hrs
-   assign TPmen = (Smax && Mmax && Hmax) || (Timeset && Hmax && Hrsadv) || (Timeset && Hmax && Mmax && Minadv);
+   assign TPmen = (Smax && Mmax && Hmax) || (Timeset && Hmax && Hrsadv);
    regce TPMct(.out(TPm), .inp(!TPm), .en(TPmen),
                .clk(Pulse), .rst(Reset));
 
@@ -64,13 +64,13 @@ module top_level_lab2_part2(
     .clk(Pulse), .rst(Reset), .en(AMen), .ct_out(AMin), .z(AMmax)
    ); 
 
-  assign AHen = Alarmset && ((Minadv && AMmax) || Hrsadv);
+  assign AHen = Alarmset && Hrsadv;
   ct_mod_N #(.N(12)) Hreg(          
     .clk(Pulse), .rst(Reset), .en(AHen), .ct_out(AHrs), .z(AHmax)
   ); 
 
    // alarm AM/PM state 
-   assign APmen = Alarmset && ((AHmax && Minadv && AMmax) || (AHmax && Hrsadv));
+   assign APmen = Alarmset && AHmax && Hrsadv;
    regce APMReg(.out(APm), .inp(!APm), .en(APmen),
                .clk(Pulse), .rst(Reset));
 

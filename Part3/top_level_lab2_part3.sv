@@ -45,13 +45,13 @@ module top_level_lab2_part2(
    );
 
 
-   assign THen = (Mmax && Smax) || (Timeset && Hrsadv) || (Timeset && Mmax && Minadv);  // It resets to 00 instead of staying at 12.
+   assign THen = (Mmax && Smax) || (Timeset && Hrsadv);  // It resets to 00 instead of staying at 12.
    ct_mod_N #(.N(12)) Hct(                          
          .clk(Pulse), .rst(Reset), .en(THen), .ct_out(THrs), .z(Hmax)
    );
 
 
-   assign TPmen = (Smax && Mmax && Hmax) || (Timeset && Hmax && Hrsadv) || (Timeset && Hmax && Mmax && Minadv);
+   assign TPmen = (Smax && Mmax && Hmax) || (Timeset && Hmax && Hrsadv);
    regce TPMct(.out(TPm), .inp(!TPm), .en(TPmen),
                .clk(Pulse), .rst(Reset));
 
@@ -61,13 +61,13 @@ module top_level_lab2_part2(
     .clk(Pulse), .rst(Reset), .en(AMen), .ct_out(AMin), .z(AMmax)
    ); 
 
-  assign AHen = Alarmset && ((Minadv && AMmax) || Hrsadv);
+  assign AHen = Alarmset && Hrsadv;
   ct_mod_N #(.N(12)) Hreg(          
     .clk(Pulse), .rst(Reset), .en(AHen), .ct_out(AHrs), .z(AHmax)
   ); 
 
    // alarm AM/PM state 
-   assign APmen = Alarmset && ((AHmax && Minadv && AMmax) || (AHmax && Hrsadv));
+   assign APmen = Alarmset && AHmax && Hrsadv;
    regce APMReg(.out(APm), .inp(!APm), .en(APmen),
                .clk(Pulse), .rst(Reset));
 
@@ -105,17 +105,11 @@ module top_level_lab2_part2(
          .clk(Pulse), .rst(Reset), .en(Dayen), .ct_out(TDay), .z(Dmax)
    );
 
-//  always_comb case(TDay) 
-//    3'b000 : DayLED = 7'b0111111;
-//    3'b001 : DayLED = 7'b1011111;
-//    3'b010 : DayLED = 7'b1101111;
-//    3'b011 : DayLED = 7'b1110111;
-//    3'b100 : DayLED = 7'b1111011;
-//    3'b101 : DayLED = 7'b1111101;
-//    3'b110 : DayLED = 7'b1111110;
-//    default : DayLED = 7'h00;
-//  endcase
-
 	assign DayLED = TDay == 0 ? 7'b1000000 : TDay == 1 ? 7'b0100000 : TDay == 2 ? 7'b0010000 : TDay == 3 ? 7'b0001000 :
 						      TDay == 4 ? 7'b0000100 : TDay == 5 ? 7'b0000010 : TDay == 6 ? 7'b0000001 : 7'h00;
+      
+  
+  // Date and Month
+ 
+
 endmodule
