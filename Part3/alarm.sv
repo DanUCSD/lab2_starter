@@ -11,9 +11,7 @@ module alarm(
   output logic buzz
 );
 
-   /* fill in the details
-    combinatorial logic (no clock, use  blocking assignments "="
-    not <=
-    buzz = ( condition for matching min's hours and pm/am )
-    */
+  assign buzz = (tmin == amin) && (thrs == ahrs) && (tpm == apm);
+
+
 endmodule
