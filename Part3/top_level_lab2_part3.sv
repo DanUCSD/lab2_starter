@@ -99,7 +99,7 @@ module top_level_lab2_part3(
            .tmin(TMin), .amin(AMin), .thrs(THrs), .ahrs(AHrs), .tpm(TPm), .apm(APm), .buzz(Buzz1)
            );
 
-	assign Buzz = Alarmon ? Buzz1 : 0;
+	assign Buzz = Buzz ? Alarmon : Alarmon && Buzz1;
  
 	assign AMorPM = Alarmset ? APm : TPm;
 
