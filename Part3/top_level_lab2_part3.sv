@@ -1,7 +1,7 @@
 // CSE140L  
 // see Structural Diagram in Lab2 Part 3assignment writeup
 // fill in missing connections and parameters
-module top_level_lab2_part2(
+module top_level_lab2_part3(
   input Reset,
         Timeset, 	  // manual buttons
         Alarmset,	  //	(five total)
@@ -12,7 +12,7 @@ module top_level_lab2_part2(
         Dateadv,
         Alarmon,
         Pulse,		  // assume 1/sec.
-        DorT			   
+        DorT,			   
 // 6 decimal digit display (7 segment)
   output[6:0] S1disp, S0disp, 	   // 2-digit seconds display
               M1disp, M0disp, 
