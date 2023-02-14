@@ -31,34 +31,28 @@ module top_level_lab2_part2(
         Dayen;
   logic         Buzz1;             // intermediate Buzz signal
 
-         // be sure to set parameters on ct_mod_N modules
-   // seconds counter runs continuously, but stalls when Timeset is on 
+
    ct_mod_N #(.N()) Sct(
          .clk(Pulse), .rst(Reset), .en(!Timeset), .ct_out(TSec), .z(Smax)    
    );
 
-   // minutes counter -- runs at either 1/sec or 1/60sec
-   // make the appropriate connections. Make sure you use
-   // a consistent clock signal. Do not use logic signals as clocks 
-   // (EVER IN THIS CLASS)
         // if Smax is true (if we need to increment minutes), then run this
    assign TMen = Smax || (Timeset && Minadv);
    ct_mod_N #(.N()) Mct(
          .clk(Pulse), .rst(Reset), .en(TMen), .ct_out(TMin), .z(Mmax)
    );
 
-   // hours counter -- runs at either 1/sec or 1/60min
+
    assign THen = (Mmax && Smax) || (Timeset && Hrsadv);  // It resets to 00 instead of staying at 12.
    ct_mod_N #(.N(12)) Hct(                          
          .clk(Pulse), .rst(Reset), .en(THen), .ct_out(THrs), .z(Hmax)
    );
 
-   // AM/PM state  --  runs at 1/12 sec or 1/12hrs
+
    assign TPmen = (Smax && Mmax && Hmax) || (Timeset && Hmax && Hrsadv);
    regce TPMct(.out(TPm), .inp(!TPm), .en(TPmen),
                .clk(Pulse), .rst(Reset));
 
-	// alarm set registers -- either hold or advance 1/sec
   assign AMen = Alarmset && Minadv;
   ct_mod_N #(.N()) Mreg(
     .clk(Pulse), .rst(Reset), .en(AMen), .ct_out(AMin), .z(AMmax)
@@ -93,25 +87,17 @@ module top_level_lab2_part2(
         .Segment0  (H0disp)
         );
 
-   // counter enable control logic
-   // create some logic for the various *en signals (e.g. TMen)
- 
-  
-   
-   // display select logic (decide what to send to the seven segment outputs) 
-   
       alarm a1(
            .tmin(TMin), .amin(AMin), .thrs(THrs), .ahrs(AHrs), .tpm(TPm), .apm(APm), .buzz(Buzz1)
            );
 
       assign Buzz = Alarmon ? Buzz1 : 0;
 
-      // generate AMorPM signal (what are the sources for this LED?)/
 
       assign AMorPM = Alarmset ? APm : TPm;
 	// Day LED, Dayen'ed when dayadv or (pm and (natural roll over or hrsadv roll over or minadv roll over))
 	
-      assign Dayen = Dayadv || (TPm && ((Smax && Mmax && Hmax) || (Timeset && Hmax && Hrsadv) || (Timeset && Hmax && Mmax && Minadv)));
+      assign Dayen = (TPm && Smax && Mmax && Hmax) || (Timeset && Dayadv);
 	ct_mod_N #(.N(7)) Dct(                          
          .clk(Pulse), .rst(Reset), .en(Dayen), .ct_out(TDay), .z(Dmax)
       );
