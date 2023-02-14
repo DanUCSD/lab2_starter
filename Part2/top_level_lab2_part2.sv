@@ -109,13 +109,14 @@ module top_level_lab2_part2(
       // generate AMorPM signal (what are the sources for this LED?)/
 
       assign AMorPM = Alarmset ? APm : TPm;
+	// Day LED, Dayen'ed when dayadv or (pm and (natural roll over or hrsadv roll over or minadv roll over))
+	
+      assign Dayen = Dayadv || (TPm && ((Smax && Mmax && Hmax) || (Timeset && Hmax && Hrsadv) || (Timeset && Hmax && Mmax && Minadv)));
+	ct_mod_N #(.N(7)) Dct(                          
+         .clk(Pulse), .rst(Reset), .en(Dayen), .ct_out(TDay), .z(Dmax)
+      );
+
+	assign DayLED = TDay == 0 ? 7'b1000000 : TDay == 1 ? 7'b0100000 : TDay == 2 ? 7'b0010000 : TDay == 3 ? 7'b0001000 :
+						 TDay == 4 ? 7'b0000100 : TDay == 5 ? 7'b0000010 : TDay == 6 ? 7'b0000001 : 7'h00;
   
 endmodule
-// 	// Day LED, Dayen'ed when dayadv or (pm and (natural roll over or hrsadv roll over or minadv roll over))
-// 	assign Dayen = Dayadv || (TPm && ((Smax && Mmax && Hmax) || (Timeset && Hmax && Hrsadv) || (Timeset && Hmax && Mmax && Minadv)));
-// 	ct_mod_N #(.N(7)) Dct(                          
-//          .clk(Pulse), .rst(Reset), .en(Dayen), .ct_out(TDay), .z(Dmax)
-//    );
-
-// 	assign DayLED = TDay == 0 ? 7'b1000000 : TDay == 1 ? 7'b0100000 : TDay == 2 ? 7'b0010000 : TDay == 3 ? 7'b0001000 :
-// 						 TDay == 4 ? 7'b0000100 : TDay == 5 ? 7'b0000010 : TDay == 6 ? 7'b0000001 : 7'h00;
