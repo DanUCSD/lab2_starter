@@ -90,7 +90,7 @@ module top_level_lab2_part3(
         );
 
   lcd_int Hdisp(
-    .bin_in    (DorT ? Tmonth : (Alarmset ? AHrs == 0 ? 12 : AHrs: THrs == 0 ? 12: THrs)),
+    .bin_in    (DorT ? TMonth : (Alarmset ? AHrs == 0 ? 12 : AHrs: THrs == 0 ? 12: THrs)),
         .Segment1  (H1disp),                                // if display date, swap for month
         .Segment0  (H0disp)
         );
