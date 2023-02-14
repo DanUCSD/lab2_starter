@@ -25,13 +25,18 @@ module top_level_lab2_part2(
    logic       TPm;                // time PM
    logic [6:0] AMin, AHrs;         // alarm setting
    logic       APm;                // alarm PM
-   logic [2:0] TDay;
+   logic [2:0] TDay;               // Part 2 Day of the Week
+   logic [4:0] TDate;              // Part 3 Date
+   logic [3:0] TMonth;             // Part 3 Month
+   logic [6:0] dummyS1, dummyS0;   // Part 3 seconds display for DorT
    
      
   logic[6:0] Min, Hrs;                     // drive Min and Hr displays
   logic Smax, Mmax, Hmax, Dmax,         // "carry out" from sec -> min, min -> hrs, hrs -> days
         TMen, THen, TPmen, AMen, AHen, AHmax, AMmax, APmen,    // respective counter enables
-        Dayen;
+        Dayen,
+        Dateen, Monthen,                 // date and month ct enablers
+        Datemax, Monthmax;               // datemax for roll over, monthmax just in case (?)
         logic         Buzz1;             // intermediate Buzz signal
 
    ct_mod_N #(.N()) Sct(
@@ -74,19 +79,19 @@ module top_level_lab2_part2(
    // display drivers (2 digits each, 6 digits total)
    lcd_int Sdisp(
     .bin_in    (TSec)  ,
-        .Segment1  (S1disp),
-        .Segment0  (S0disp)
+        .Segment1  (DorT ? dummyS1 : S1disp),               // if display date, send seconds into the shadow realm
+        .Segment0  (DorT ? dummyS0 : S0disp)
    );
 
    lcd_int Mdisp(
-    .bin_in    (Alarmset ? AMin: TMin) ,
+    .bin_in    (DorT ? TDate : (Alarmset ? AMin: TMin)) ,   // if display date, swap for date
         .Segment1  (M1disp),
         .Segment0  (M0disp)
         );
 
   lcd_int Hdisp(
-    .bin_in    (Alarmset ? AHrs == 0 ? 12 : AHrs: THrs == 0 ? 12: THrs),
-        .Segment1  (H1disp),
+    .bin_in    (DorT ? Tmonth : (Alarmset ? AHrs == 0 ? 12 : AHrs: THrs == 0 ? 12: THrs)),
+        .Segment1  (H1disp),                                // if display date, swap for month
         .Segment0  (H0disp)
         );
         
@@ -100,7 +105,7 @@ module top_level_lab2_part2(
 
   // Day LED, Dayen'ed when dayadv or (pm and (natural roll over or hrsadv roll over or minadv roll over))
 
-  assign Dayen = Dayadv || (TPm && (Smax && Mmax && Hmax) || (Timeset && Hmax && Hrsadv) || (Timeset && Hmax && Mmax && Minadv));
+  assign Dayen = (TPm && Smax && Mmax && Hmax) || (Timeset && Dayadv);
   ct_mod_N #(.N(7)) Dct(                          
          .clk(Pulse), .rst(Reset), .en(Dayen), .ct_out(TDay), .z(Dmax)
    );
@@ -110,6 +115,17 @@ module top_level_lab2_part2(
       
   
   // Date and Month
- 
+
+      assign Dateen = (TPm && Smax && Mmax && Hmax) || (Timeset && Dateadv);              // natural roll over + timeset
+      ct_mod_D Dtct(
+            .clk(Pulse), .rst(Reset), .en(Dateen), .TMo0(TMonth), .ct_out(TDate), .z(Datemax)
+      );
+
+      assign Monthen = (Datemax && TPm && Smax && Mmax && Hmax) || (Timeset && Monthadv); // natural roll over + timeset
+      ct_mod_N #(.N(12)) Mnct(
+            .clk(Pulse), .rst(Reset), .en(Monthen), .ct_out(TMonth), .z(Monthmax)
+      );
+  
+      
 
 endmodule
