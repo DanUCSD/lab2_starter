@@ -15,8 +15,8 @@ module top_level_lab2_part3(
         DorT,			   
 // 6 decimal digit display (7 segment)
   output[6:0] S1disp, S0disp, 	   // 2-digit seconds display
-              M1disp, M0disp, 
-              H1disp, H0disp,
+              MD1disp, MD0disp, 
+              HM1disp, HM0disp,
               DayLED,
   output logic AMorPM,            // Added by Arpita 
   output logic Buzz);	           // alarm sounds
@@ -26,8 +26,8 @@ module top_level_lab2_part3(
    logic [6:0] AMin, AHrs;         // alarm setting
    logic       APm;                // alarm PM
    logic [2:0] TDay;               // Part 2 Day of the Week
-   logic [4:0] TDate;              // Part 3 Date
-   logic [3:0] TMonth;             // Part 3 Month
+   logic [5:0] TDate;              // Part 3 Date
+   logic [4:0] TMonth;             // Part 3 Month
    logic [6:0] dummyS1, dummyS0;   // Part 3 seconds display for DorT
    
      
@@ -79,20 +79,24 @@ module top_level_lab2_part3(
    // display drivers (2 digits each, 6 digits total)
    lcd_int Sdisp(
     .bin_in    (TSec)  ,
-        .Segment1  (DorT ? dummyS1 : S1disp),               // if display date, send seconds into the shadow realm
-        .Segment0  (DorT ? dummyS0 : S0disp)
+        .Segment1  (dummyS1),               // if display date, send seconds into the shadow realm
+        .Segment0  (dummyS0)
    );
 
+	assign S1disp = DorT ? 7'b1111111 : dummyS1;
+	assign S0disp = DorT ? 7'b1111111 : dummyS0;
+	
    lcd_int Mdisp(
-    .bin_in    (DorT ? TDate : (Alarmset ? AMin: TMin)) ,   // if display date, swap for date
-        .Segment1  (M1disp),
-        .Segment0  (M0disp)
+    .bin_in    (DorT ? TDate + 1: (Alarmset ? AMin: TMin)) ,   // if display date, swap for date
+        .Segment1  (MD1disp),
+        .Segment0  (MD0disp)
         );
-
+		  
+		  
   lcd_int Hdisp(
-    .bin_in    (DorT ? TMonth : (Alarmset ? AHrs == 0 ? 12 : AHrs: THrs == 0 ? 12: THrs)),
-        .Segment1  (H1disp),                                // if display date, swap for month
-        .Segment0  (H0disp)
+    .bin_in    (DorT ? TMonth + 1 : (Alarmset ? AHrs == 0 ? 12 : AHrs: THrs == 0 ? 12: THrs)),
+        .Segment1  (HM1disp),                                // if display date, swap for month
+        .Segment0  (HM0disp)
         );
         
    alarm a1(
