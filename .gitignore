@@ -14,3 +14,5 @@ Part2/db/
 Part2/incremental_db/
 Part2/sim/*
 Part3/db/*
+Part3/incremental_db/*
+Part3/sim/*
