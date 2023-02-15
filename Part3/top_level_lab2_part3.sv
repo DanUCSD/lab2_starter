@@ -36,7 +36,7 @@ module top_level_lab2_part3(
         TMen, THen, TPmen, AMen, AHen, AHmax, AMmax, APmen,    // respective counter enables
         Dayen,
         Dateen, Monthen,                 // date and month ct enablers
-        Datemax, Monthmax;               // datemax for roll over, monthmax just in case (?)
+        Datemax;               // datemax for roll over, monthmax just in case (?)
         logic         Buzz1;             // intermediate Buzz signal
 
    ct_mod_N #(.N()) Sct(
@@ -123,7 +123,7 @@ module top_level_lab2_part3(
 
       assign Monthen = (Datemax && TPm && Smax && Mmax && Hmax) || (Timeset && Monthadv); // natural roll over + timeset
       ct_mod_N #(.N(12)) Mnct(
-            .clk(Pulse), .rst(Reset), .en(Monthen), .ct_out(TMonth), .z(Monthmax)
+            .clk(Pulse), .rst(Reset), .en(Monthen), .ct_out(TMonth), .z()
       );
   
       
